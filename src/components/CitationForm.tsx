@@ -29,10 +29,14 @@ const CitationForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = (data) =>
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    const name = `${
+      data.fullName.split(" ")[1]
+    },${data.fullName[0]?.toUpperCase()}`;
     console.log(
-      `${data.fullName}.${data.dateOfPublication}:${data.titleOfPost}.${data.websiteName}.${data.url}`
+      `${name}.(${data.dateOfPublication}):${data.titleOfPost}.${data.websiteName}.${data.url}`
     );
+  };
 
   return (
     <form

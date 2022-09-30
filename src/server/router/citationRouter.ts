@@ -3,6 +3,11 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 export const citationRouter = createRouter()
+  .query("getAll", {
+    async resolve({ ctx }) {
+      return await ctx.prisma.citation.findMany({});
+    },
+  })
   .middleware(async ({ ctx, next }) => {
     if (!ctx.session) {
       throw new TRPCError({ code: "UNAUTHORIZED" });

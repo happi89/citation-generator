@@ -1,8 +1,43 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import CitationForm from "../components/CitationForm";
+import create from "zustand";
+import { Citation } from "@prisma/client";
+import { trpc } from "../utils/trpc";
+import { signIn, useSession } from "next-auth/react";
+
+interface CitationState {
+  citations: Citation[];
+  setCitations: (citations: Citation[]) => void;
+  addCitation: (citation: Citation) => void;
+  removeCitation: (citationToDelete: Citation) => void;
+}
+
+const useCitationsStore = create<CitationState>((set, get) => ({
+  citations: [],
+  setCitations: (citations) => set({ citations }),
+  addCitation: (citation: Citation) =>
+    set((state) => ({ citations: [...state.citations, citation] }), true),
+  removeCitation: (citationToDelete: Citation) => {
+    const citations = get().citations;
+    const updateCitations = citations.filter(
+      (citation) => citation.id !== citationToDelete.id
+    );
+    set(() => ({
+      citations: updateCitations,
+    }));
+  },
+}));
 
 const Home: NextPage = () => {
+  const { data: citations, isLoading } = trpc.useQuery(["citation.getAll"]);
+  const { data: session } = useSession();
+  if (isLoading) return <div>Loading</div>;
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  useCitationsStore.getState().setCitations(citations!);
+  console.log(useCitationsStore.getState().citations);
+
   return (
     <>
       <Head>
@@ -17,6 +52,12 @@ const Home: NextPage = () => {
         </h1>
         <CitationForm />
         <h2 className="ml-8 text-xl font-bold">Citations</h2>
+        {!session?.user?.id && (
+          <button className="btn btn-primary" onClick={() => signIn("discord")}>
+            Login with discord
+          </button>
+        )}
+        {citations?.map((c) => c.content)}
       </main>
     </>
   );
