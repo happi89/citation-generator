@@ -5,7 +5,11 @@ import { TRPCError } from "@trpc/server";
 export const citationRouter = createRouter()
   .query("getAll", {
     async resolve({ ctx }) {
-      return await ctx.prisma.citation.findMany({});
+      return await ctx.prisma.citation.findMany({
+        where: {
+          userId: ctx?.session?.user?.id,
+        },
+      });
     },
   })
   .middleware(async ({ ctx, next }) => {
@@ -23,6 +27,18 @@ export const citationRouter = createRouter()
         data: {
           content: input.content,
           userId: String(ctx?.session?.user?.id),
+        },
+      });
+    },
+  })
+  .mutation("delete", {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.citation.delete({
+        where: {
+          id: input.id,
         },
       });
     },
