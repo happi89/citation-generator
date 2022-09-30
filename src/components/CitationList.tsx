@@ -15,22 +15,32 @@ export default function CitationList({ citations }: { citations: Citation[] }) {
         {citations?.map((c: Citation, i: number) => (
           <li key={i} className="list-divide-secondary my-1">
             {c.content}
-            <button
-              className="btn-sqaure btn btn-ghost btn-sm ml-2"
-              onClick={() => {
-                removeCitationFromDb.mutate({
-                  id: c.id,
-                });
-              }}
-            >
-              <TrashIcon className="w-4" />
-            </button>
-            <button
-              className="btn-sqaure btn btn-ghost btn-sm ml-2"
-              onClick={() => navigator.clipboard.writeText(c.content)}
-            >
-              <ClipboardIcon className="w-4" />
-            </button>
+            <div className="tooltip" data-tip="delete">
+              <button
+                className="btn-sqaure btn btn-ghost btn-sm ml-2"
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      `Are you sure you want to delete ${c.content}`
+                    )
+                  ) {
+                    removeCitationFromDb.mutate({
+                      id: c.id,
+                    });
+                  }
+                }}
+              >
+                <TrashIcon className="w-4" />
+              </button>
+            </div>
+            <div className="tooltip" data-tip="copy">
+              <button
+                className="btn-sqaure btn btn-ghost btn-sm ml-2"
+                onClick={() => navigator.clipboard.writeText(c.content)}
+              >
+                <ClipboardIcon className="w-4" />
+              </button>
+            </div>
           </li>
         ))}
       </ul>

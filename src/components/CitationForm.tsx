@@ -1,10 +1,11 @@
 import { TextInput } from "./TextInput";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { trpc } from "../utils/trpc";
+import { useEffect } from "react";
 
 export type Inputs = {
   fullName: string;
-  dateOfPublication: Date;
+  dateOfPublication: string;
   titleOfPost: string;
   websiteName: string;
   url: string;
@@ -33,6 +34,9 @@ const CitationForm = () => {
   const {
     register,
     handleSubmit,
+    reset,
+    formState,
+    formState: { isSubmitSuccessful },
     formState: { errors },
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -45,6 +49,18 @@ const CitationForm = () => {
       content: citation,
     });
   };
+
+  useEffect(() => {
+    if (formState.isSubmitSuccessful) {
+      reset({
+        fullName: "",
+        titleOfPost: "",
+        websiteName: "",
+        url: "",
+        dateOfPublication: "",
+      });
+    }
+  }, [formState, reset]);
 
   return (
     <form
