@@ -1,5 +1,6 @@
 import { TextInput } from "./TextInput";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { trpc } from "../utils/trpc";
 
 export type Inputs = {
   fullName: string;
@@ -24,6 +25,11 @@ export type inputProps = {
 };
 
 const CitationForm = () => {
+  const ctx = trpc.useContext();
+  const addCitation = trpc.useMutation("citation.add", {
+    onSuccess: () => ctx.invalidateQueries(["citation.getAll"]),
+  });
+
   const {
     register,
     handleSubmit,
@@ -33,9 +39,11 @@ const CitationForm = () => {
     const name = `${
       data.fullName.split(" ")[1]
     },${data.fullName[0]?.toUpperCase()}`;
-    console.log(
-      `${name}.(${data.dateOfPublication}):${data.titleOfPost}.${data.websiteName}.${data.url}`
-    );
+    const citation = `${name}.(${data.dateOfPublication}):${data.titleOfPost}.${data.websiteName}.${data.url}`;
+
+    addCitation.mutate({
+      content: citation,
+    });
   };
 
   return (

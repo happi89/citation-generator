@@ -47,17 +47,25 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="container mx-auto min-h-screen p-4">
-        <h1 className="mb-[-4rem] text-center text-2xl font-bold">
-          Citation Generator
-        </h1>
-        <CitationForm />
-        <h2 className="ml-8 text-xl font-bold">Citations</h2>
         {!session?.user?.id && (
           <button className="btn btn-primary" onClick={() => signIn("discord")}>
             Login with discord
           </button>
         )}
-        {citations?.map((c) => c.content)}
+        <h1 className="mb-[-4rem] text-center text-2xl font-bold">
+          Citation Generator
+        </h1>
+        <CitationForm />
+        <div className="container mx-auto px-24">
+          <h2 className="text-xl font-bold">Citations</h2>
+          <ul>
+            {citations?.map((c, i) => (
+              <li key={i} className="list-disc">
+                {c.content}
+              </li>
+            ))}
+          </ul>
+        </div>
       </main>
     </>
   );
