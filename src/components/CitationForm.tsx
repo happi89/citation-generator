@@ -1,7 +1,7 @@
 import { TextInput } from "./TextInput";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { trpc } from "../utils/trpc";
-import { useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 
 export type Inputs = {
   fullName: string;
@@ -25,10 +25,18 @@ export type inputProps = {
   errorMessage: string;
 };
 
-const CitationForm = () => {
+const CitationForm = ({
+  setOpen,
+  open,
+}: {
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  open: boolean;
+}) => {
   const ctx = trpc.useContext();
   const addCitation = trpc.useMutation("citation.add", {
-    onSuccess: () => ctx.invalidateQueries(["citation.getAll"]),
+    onSuccess: () => {
+      ctx.invalidateQueries(["citation.getAll"]);
+    },
   });
 
   const {
@@ -36,7 +44,6 @@ const CitationForm = () => {
     handleSubmit,
     reset,
     formState,
-    formState: { isSubmitSuccessful },
     formState: { errors },
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -45,9 +52,11 @@ const CitationForm = () => {
     },${data.fullName[0]?.toUpperCase()}`;
     const citation = `${name}.(${data.dateOfPublication}):${data.titleOfPost}.${data.websiteName}.${data.url}`;
 
-    addCitation.mutate({
+    addCitation?.mutate({
       content: citation,
     });
+
+    setOpen(!open);
   };
 
   useEffect(() => {
@@ -64,7 +73,7 @@ const CitationForm = () => {
 
   return (
     <form
-      className="container mx-auto mt-24 mb-12 flex max-w-2xl flex-col items-center gap-4"
+      className="container mx-auto mt-8 mb-12 flex max-w-2xl flex-col items-center gap-4"
       onSubmit={handleSubmit(onSubmit)}
     >
       {FORM_INFO.map((input, i) => {
@@ -81,7 +90,14 @@ const CitationForm = () => {
         );
       })}
 
-      <input className="btn btn-primary self-end" type="submit" />
+      <button
+        className={`btn btn-primary self-end ${
+          addCitation.isLoading && "btn-disabled loading"
+        }`}
+        type="submit"
+      >
+        Add
+      </button>
     </form>
   );
 };

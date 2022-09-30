@@ -4,8 +4,10 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import CitationForm from "../components/CitationForm";
 import { trpc } from "../utils/trpc";
 import CitationList from "../components/CitationList";
+import { useState } from "react";
 
 const Home: NextPage = () => {
+  const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const { data: citations, isLoading } = trpc.useQuery([
     "citation.getAll",
@@ -44,14 +46,17 @@ const Home: NextPage = () => {
           </>
         ) : (
           <>
-            <button className="btn btn-primary" onClick={() => signOut()}>
+            <button className="btn btn-primary mb-8" onClick={() => signOut()}>
               Logout
             </button>
-            <h1 className="mb-[-4rem] text-center text-2xl font-bold">
+            <h1 className="mb-4 text-center text-2xl font-bold">
               Citation Generator
             </h1>
-            <CitationForm />
             <CitationList citations={citations || []} />
+            <button className="btn btn-primary" onClick={() => setOpen(!open)}>
+              {open ? "Close" : "Add Citation"}
+            </button>
+            {open && <CitationForm setOpen={setOpen} open={open} />}
           </>
         )}
       </main>
