@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import CitationForm from "../components/CitationForm";
 import { trpc } from "../utils/trpc";
 import CitationList from "../components/CitationList";
@@ -12,11 +11,8 @@ const Home: NextPage = () => {
     "citation.getAll",
     { userId: String(session?.user?.id) },
   ]);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const router = useRouter();
 
   if (isLoading) return <div>Loading</div>;
-  console.log(citations);
 
   return (
     <>
@@ -28,15 +24,24 @@ const Home: NextPage = () => {
 
       <main className="container mx-auto min-h-screen p-8">
         {!session?.user?.id ? (
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              signIn("discord");
-              router.push("/citations");
-            }}
-          >
-            Login with discord
-          </button>
+          <>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                signIn("discord");
+              }}
+            >
+              Login with discord
+            </button>
+            <button
+              className="btn btn-primary ml-8"
+              onClick={() => {
+                signIn("google");
+              }}
+            >
+              Login with google
+            </button>
+          </>
         ) : (
           <>
             <button className="btn btn-primary" onClick={() => signOut()}>
