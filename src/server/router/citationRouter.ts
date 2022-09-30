@@ -4,6 +4,9 @@ import { TRPCError } from "@trpc/server";
 
 export const citationRouter = createRouter()
   .query("getAll", {
+    input: z.object({
+      userId: z.string(),
+    }),
     async resolve({ ctx }) {
       return await ctx.prisma.citation.findMany({
         where: {
