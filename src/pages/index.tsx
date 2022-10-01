@@ -1,21 +1,19 @@
 import Login from "./../components/Login";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { signOut, useSession } from "next-auth/react";
-import CitationForm from "../components/CitationForm";
-import { trpc } from "../utils/trpc";
-import CitationList from "../components/CitationList";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 const Home: NextPage = () => {
-  const [open, setOpen] = useState(false);
+  const router = useRouter();
   const { data: session } = useSession();
-  const { data: citations, isLoading } = trpc.useQuery([
-    "citation.getAll",
-    { userId: String(session?.user?.id) },
-  ]);
 
-  if (isLoading) return <div>Loading</div>;
+  useEffect(() => {
+    if (session?.user) {
+      router.push("/citations");
+    }
+  }, [router, session?.user]);
 
   return (
     <>
@@ -26,24 +24,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="container mx-auto min-h-screen p-8">
-        {!session?.user?.id ? (
-          <Login />
-        ) : (
-          <>
-            <button className="btn btn-primary mb-8" onClick={() => signOut()}>
-              Logout
-            </button>
-            <h1 className="mb-4 text-start text-2xl font-bold">
-              Citation Generator
-            </h1>
-            <p className="text-lg font-bold">Hello {session.user.name}</p>
-            <CitationList citations={citations || []} />
-            <button className="btn btn-primary" onClick={() => setOpen(!open)}>
-              {open ? "Close" : "Add Citation"}
-            </button>
-            {open && <CitationForm setOpen={setOpen} open={open} />}
-          </>
-        )}
+        <Login />
       </main>
     </>
   );
