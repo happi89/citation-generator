@@ -49,8 +49,8 @@ const CitationForm = ({
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const name = `${
       data.fullName.split(" ")[1]
-    },${data.fullName[0]?.toUpperCase()}`;
-    const citation = `${name}.(${data.dateOfPublication}):${data.titleOfPost}.${data.websiteName}.${data.url}`;
+    }, ${data.fullName[0]?.toUpperCase()}`;
+    const citation = `"${name}." (${data.dateOfPublication}), ${data.titleOfPost}, ${data.websiteName}, ${data.url}`;
 
     addCitation?.mutate({
       content: citation,
